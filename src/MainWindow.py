@@ -52,7 +52,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def enter_game(self, game):
         """Enter Game event
-        Create a Twitch prediction using the players names
+        Create a Twitch prediction using the players names as options
         """
 
         # We only care about 1v1 games for now
