@@ -1,0 +1,82 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - README.md
+      - .gitignore
+      - docs/**
+
+jobs:
+  Build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Build binary
+      run: |
+        pyinstaller foresee.spec
+
+    - name: Create archive (.zip - Windows)
+      uses: papeloto/action-zip@v1
+      with:
+        files: dist/
+        dest: foresee-${{ runner.os }}.zip
+      if: runner.os == 'Windows'
+
+    - name: Upload archive (.zip - Windows)
+      uses: actions/upload-artifact@v2
+      with:
+        path: foresee-${{ runner.os }}.zip
+        name: foresee-${{ runner.os }}.zip
+        retention-days: 1
+      if: runner.os == 'Windows'
+
+    - name: Create archive (.tar.gz - Linux/macOS)
+      run: |
+        tar -czvf foresee-${{ runner.os }}.tar.gz -C dist/ foresee
+      if: runner.os != 'Windows'
+
+    - name: Upload archive (.tar.gz - Linux/macOS)
+      uses: actions/upload-artifact@v2
+      with:
+        path: foresee-${{ runner.os }}.tar.gz
+        name: foresee-${{ runner.os }}.tar.gz
+        retention-days: 1
+      if: runner.os != 'Windows'
+
+
+  Create-Release:
+    needs:
+      - Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download all build archives
+        uses: actions/download-artifact@v2
+
+      - name: Create draft release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: "latest"
+          draft: true
+          files: |
+            **/foresee-*.zip
+            **/foresee-*.tar.gz

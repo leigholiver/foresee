@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Foresee</title>
+        <style>
+            .container {
+                margin-left: auto;
+                margin-right: auto;
+                max-width: 800px;
+                font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            }
+
+            #token {
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Foresee</h1>
+            <p>
+                Foresee automates <a href="https://help.twitch.tv/s/article/channel-points-predictions?language=en_US">Twitch Channel Points Predictions</a> for StarCraft 2 games, <a href="https://github.com/leigholiver/foresee">find out more on GitHub.</a>
+            </p>
+            <p>
+                Your Twitch OAuth Token is <span id="token">...</span>
+            </p>
+            <p>
+                To revoke access, disconnect "Foresee" from <a href="https://www.twitch.tv/settings/connections">your Twitch settings</a>.
+            </p>
+            <p>
+                Technical: This application uses the <a href="https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#oauth-implicit-code-flow">implicit grant flow</a> for the Twitch API to retrieve your token. This means that your token is only ever visible to your browser.
+            </p>
+        </div>
+        <script>
+            // Get the access_token from the URL hash fragment, and insert it into the page
+            var token = window.location.hash.match(/access_token=(.*?)&/);
+            document.getElementById('token').innerHTML = token[1];
+        </script>
+    </body>
+</html>
